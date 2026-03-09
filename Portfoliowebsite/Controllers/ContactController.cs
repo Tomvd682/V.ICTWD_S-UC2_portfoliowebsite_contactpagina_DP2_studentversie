@@ -1,28 +1,60 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Portfoliowebsite.Models;
 using Portfoliowebsite.Services;
 
 namespace Portfoliowebsite.Controllers
 {
     public class ContactController : Controller
     {
-
         private readonly IEmailSender _email;
-        public ContactController(IEmailSender email) => _email = email;
 
-        public IActionResult Index() => View();
+        public ContactController(IEmailSender email)
+        {
+            _email = email;
+        }
+
+        [HttpGet]
+        public IActionResult Index()
+        {
+            return View(new ContactFormModel());
+        }
 
         [HttpPost]
-        public async Task<IActionResult> Index(string Name, string Email, string Subject, string Message)
+        [ValidateAntiForgeryToken]
+        public IActionResult Index(ContactFormModel model)
         {
-            await _email.SendAsync(Name, Email, Subject, Message);
+            if (!string.IsNullOrWhiteSpace(model.Website))
+            {
+                ViewBag.DebugMessage = "Honeypot gevuld";
+                return View(model);
+            }
 
-            TempData["ThanksName"] = Name;
-            TempData["ThanksEmail"] = Email;
-            TempData["ThanksMessage"] = Message;
+            if (!ModelState.IsValid)
+            {
+                var errors = new List<string>();
+
+                foreach (var entry in ModelState)
+                {
+                    foreach (var error in entry.Value.Errors)
+                    {
+                        errors.Add($"{entry.Key}: {error.ErrorMessage}");
+                    }
+                }
+
+                ViewBag.DebugMessage = "ModelState ongeldig";
+                ViewBag.DebugErrors = errors;
+
+                return View(model);
+            }
+
+            TempData["ThanksName"] = model.Name;
+            TempData["ThanksEmail"] = model.Email;
+            TempData["ThanksMessage"] = model.Message;
 
             return RedirectToAction(nameof(Thanks));
         }
 
+        [HttpGet]
         public IActionResult Thanks()
         {
             return View();

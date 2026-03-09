@@ -1,35 +1,68 @@
-﻿@{
+﻿@model Portfoliowebsite.Models.ContactFormModel
+
+@{
     ViewData["Title"] = "Contact";
 }
 
 <h1>Contact</h1>
+@* @if (ViewBag.DebugMessage != null)
+{
+    <div style="margin-bottom: 10px;">
+        @ViewBag.DebugMessage
+    </div>
+}
+
+@if (ViewBag.DebugErrors != null)
+{
+    <ul style="margin-bottom: 15px;">
+        @foreach (var error in ViewBag.DebugErrors)
+        {
+            <li>@error</li>
+        }
+    </ul>
+} *@
 
 <form id="contactForm" asp-action="Index" method="post" novalidate>
     @Html.AntiForgeryToken()
-    <div class="hp">
-        <label for="website">Laat dit veld leeg</label>
-        <input type="text" id="website" name="website" value="" />
+
+    <div class="hp" aria-hidden="true">
+        <label asp-for="Website">Laat dit veld leeg</label>
+        <input asp-for="Website" type="text" tabindex="-1" autocomplete="off" />
     </div>
+
     <div>
-        <input id="Name" name="Name" placeholder="Naam" tabindex="-1" />
-        <div id="nameErr" class="error"></div>
+        <label asp-for="Name">Naam</label>
+        <input asp-for="Name" type="text" placeholder="Naam" maxlength="40" />
+        <div class="error">
+            <span asp-validation-for="Name"></span>
+        </div>
     </div>
+
     <div>
-        <label for="EmailX">E-mail</label>
-        <input id="Email" name="Email" placeholder="naam@domein.nl" />
-        <div id="emailErr" class="error"></div>
+        <label asp-for="Email">E-mail</label>
+        <input asp-for="Email" type="email" placeholder="naam@domein.nl" maxlength="40" />
+        <div class="error">
+            <span asp-validation-for="Email"></span>
+        </div>
     </div>
+
     <div>
-        <label for="Subject">Onderwerp</label>
-        <input id="Subject" name="Subject" placeholder="Onderwerp" />
+        <label asp-for="Subject">Onderwerp</label>
+        <input asp-for="Subject" type="text" placeholder="Onderwerp" maxlength="40" />
+        <div class="error">
+            <span asp-validation-for="Subject"></span>
+        </div>
     </div>
+
     <div>
-        <label for="Message" aria-hidden="true">Bericht</label> 
-        <textarea id="Message" name="Message" rows="5" placeholder="Je bericht"></textarea>
-        <div id="msgErr" class="error"></div>
+        <label asp-for="Message">Bericht</label>
+        <textarea asp-for="Message" rows="5" placeholder="Je bericht" maxlength="1234"></textarea>
+        <div class="error">
+            <span asp-validation-for="Message"></span>
+        </div>
     </div>
-    <div id="liveStatus"></div>
-    <div class="send-button" role="button" onclick="document.getElementById('contactForm').submit()">
-        Versturen
-    </div>
+
+    <div id="liveStatus" aria-live="polite"></div>
+
+    <button type="submit" class="send-button">Versturen</button>
 </form>
